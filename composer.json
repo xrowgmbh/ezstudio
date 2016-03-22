@@ -11,7 +11,7 @@
         }
     ],
     "repositories": [
-        { "type": "composer", "url": "https://updates.ez.no/ttl" }
+        { "type": "composer", "url": "https://updates.ez.no/bul" }
     ],
     "replace": {
         "ezsystems/ezpublish-community": "*"
@@ -20,7 +20,7 @@
         "psr-0": { "": "src/" }
     },
     "require": {
-        "php": "~5.5|~7.0",
+        "php": "~5.4|~7.0",
         "symfony/symfony": "~2.7.0",
         "twig/extensions": "~1.0",
         "symfony/assetic-bundle": "~2.3",
