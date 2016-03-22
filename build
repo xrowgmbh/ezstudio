@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+
+set -e
+set -x
+
+#VERSION="1.2.x"
+#LICENCE="ttl"
+
+#maybe set COMPOSER_HOME=to a cacheable dir to speed up builds
+echo "{}" > /home/ec2-user/.composer/composer.json
+
+# make sure /home/ec2-user/.composer/config.json is writeable else composer auth is failing
+
+# composer config -g http-basic.updates.ez.no fcf812bf3e41006a6e930a3ca9d128fa CxAFnA3EQ3z2eGagrf2i
+composer config -g http-basic.updates.ez.no ${INSTALLATION_ID} ${LICENCE_KEY}
+#composer create-project -vvv xrow/ezstudio
+composer create-project -vvvv --no-dev --repository-url=https://updates.ez.no/bul ezsystems/ezstudio
+mv ezstudio/* .
+rm -Rf ezstudio
+# Install from binary 
+#if [ ! -f ~/ezstudio-dist-${VERSION}-${LICENCE}.tar.gz ]; then
+#    wget --quiet -O ~/ezstudio-dist-${VERSION}-${LICENCE}.tar.gz --no-check-certificate https://s3-eu-west-1.amazonaws.com/xrow/downloads/ezstudio/ezstudio-dist-${VERSION}-${LICENCE}.tar.gz
+#fi
+#tar --skip-old-files --strip-components=1 -xzf ~/ezstudio-dist-${VERSION}-${LICENCE}.tar.gz -C ./
+
+sed -i "s/\/\/umask(/umask(/g" app/console
+sed -i '/<?php/ a\
+umask(0000);' web/app.php
+find {app/{cache,logs},web} -type d | xargs sudo chmod -R 775
+find {app/{cache,logs},web} -type f | xargs sudo chmod -R 664
+chmod 775 app/console
+
+if [ ! ${DATABASE_PASSWORD} ]; then              
+    mysqlauth=" -h ${DATABASE_SERVER} -u ${DATABASE_USER} "                       
+else
+    mysqlauth=" -h ${DATABASE_SERVER} -u ${DATABASE_USER} -p${DATABASE_PASSWORD} " 
+fi
+mysql ${mysqlauth} -e"CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+php -d memory_limit=-1 app/console ezplatform:install --env prod demo
+php -d memory_limit=-1 app/console assetic:dump --env=prod web
+curl https://raw.githubusercontent.com/symfony/symfony-standard/master/web/.htaccess >> web/.htaccess
