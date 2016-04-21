@@ -7,19 +7,10 @@ set -x
 #LICENCE="ttl"
 
 #maybe set COMPOSER_HOME=to a cacheable dir to speed up builds
-echo "{}" > /home/ec2-user/.composer/composer.json
+#echo "{}" > /home/ec2-user/.composer/composer.json
 
-# make sure /home/ec2-user/.composer/config.json is writeable else composer auth is failing
-
-# composer config -g http-basic.updates.ez.no fcf812bf3e41006a6e930a3ca9d128fa CxAFnA3EQ3z2eGagrf2i
 composer config -g http-basic.updates.ez.no ${INSTALLATION_ID} ${LICENCE_KEY}
 composer install
-
-# Install from binary 
-#if [ ! -f ~/ezstudio-dist-${VERSION}-${LICENCE}.tar.gz ]; then
-#    wget --quiet -O ~/ezstudio-dist-${VERSION}-${LICENCE}.tar.gz --no-check-certificate https://s3-eu-west-1.amazonaws.com/xrow/downloads/ezstudio/ezstudio-dist-${VERSION}-${LICENCE}.tar.gz
-#fi
-#tar --skip-old-files --strip-components=1 -xzf ~/ezstudio-dist-${VERSION}-${LICENCE}.tar.gz -C ./
 
 sed -i "s/\/\/umask(/umask(/g" app/console
 sed -i '/<?php/ a\
