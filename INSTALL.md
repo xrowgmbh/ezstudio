@@ -48,7 +48,7 @@
 
        ```bash
        $ curl -sS https://getcomposer.org/installer | php
-       $ php -d memory_limit=-1 composer.phar create-project --no-dev--repository-url=https://updates.ez.no/bul ezsystems/ezstudio
+       $ php -d memory_limit=-1 composer.phar create-project --no-dev --repository-url=https://updates.ez.no/bul ezsystems/ezstudio
        $ cd /ezstudio/
        ```
 
@@ -131,6 +131,10 @@
        ```bash
        $ sudo chmod g+s {app/{cache,logs},web}
        ```
+       Note: due to a limitation in the Flysystem version required by eZ
+       Platform, image variations directories and files are created with a
+       hardcoded permission that prevents group users and users other than the
+       owner from writing or removing those files/directories.
 
        E. **Setup folder rights on Windows**
 
